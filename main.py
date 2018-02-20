@@ -1,7 +1,6 @@
 import audioop
+from util import *
 
-from plot import plot_signal
-from settings import *
 
 p = pyaudio.PyAudio()
 frames = []
@@ -25,14 +24,14 @@ try:
             rms = audioop.rms(data, 2)
             # Not sure why this is spiking at the beginning of each recording session...
             if rms > CRAZY_THRESHOLD:
-                print 'ignoring anomaly'
+                logger.debug('ignoring anomaly')
             else:
                 frames.append(rms)
                 if rms > RMS_THRESHOLD:
                     if not is_barking:
                         barks += 1
                         is_barking = True
-                        logger.debug('Bark!')
+                        logger.info('Bark!')
                 elif is_barking:
                     is_barking = False
 finally:

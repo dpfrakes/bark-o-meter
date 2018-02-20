@@ -1,7 +1,5 @@
 import pyaudio
 
-from logger import setup_logger
-
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
@@ -11,5 +9,3 @@ DELAY_SECONDS = 0
 
 RMS_THRESHOLD = 1000
 CRAZY_THRESHOLD = 5000
-
-logger = setup_logger()
