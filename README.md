@@ -15,5 +15,13 @@ brew install portaudio
 then
 
 ```
-pip install pyaudio
+# Create virtualenv
+virtualenv petenv
+
+# Activate virtualenv
+source ./petenv/bin/activate
+
+# Install requirements
+pip install -r requirements.txt
 ```
+
