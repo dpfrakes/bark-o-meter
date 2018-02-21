@@ -1,11 +1,11 @@
 import audioop
-from util import *
+from datetime import datetime
 
+from util import *
 
 p = pyaudio.PyAudio()
 frames = []
 barks = 0
-is_barking = False
 
 stream = p.open(format=FORMAT,
                 channels=CHANNELS,
@@ -13,36 +13,39 @@ stream = p.open(format=FORMAT,
                 input=True,
                 frames_per_buffer=CHUNK)
 
-rec_frames = int(RATE / CHUNK * RECORD_SECONDS)
-delay = int(RATE / CHUNK * DELAY_SECONDS)
+logger.info('Started recording')
+startTime = datetime.now()
+is_barking = False
 
 try:
-    logger.info('Started recording')
-    for _ in range(rec_frames):
-        if _ > delay:
-            data = stream.read(CHUNK)
-            rms = audioop.rms(data, 2)
-            # Not sure why this is spiking at the beginning of each recording session...
-            if rms > CRAZY_THRESHOLD:
-                logger.debug('ignoring anomaly')
-            else:
-                frames.append(rms)
-                if rms > RMS_THRESHOLD:
-                    if not is_barking:
-                        barks += 1
-                        is_barking = True
-                        logger.info('Bark!')
-                elif is_barking:
-                    is_barking = False
+    while True:
+        data = stream.read(CHUNK)
+        rms = audioop.rms(data, 2)
+        # Not sure why this is spiking at the beginning of each recording session...
+        if rms > CRAZY_THRESHOLD:
+            logger.debug('ignoring anomaly')
+        else:
+            frames.append(rms)
+            if rms > RMS_THRESHOLD:
+                if not is_barking:
+                    barks += 1
+                    logger.info('Bark!')
+                    is_barking = True
+            elif is_barking:
+                is_barking = False
+
+except KeyboardInterrupt as e:
+    logger.debug(e.message)
+
 finally:
     logger.info('Stopped recording')
-
-    logger.info('Total barks: {}'.format(barks))
+    stopTime = datetime.now()
+    logger.info('{} barks in {} seconds'.format(barks, stopTime - startTime))
 
     stream.stop_stream()
     stream.close()
     p.terminate()
 
-    logger.debug('{} / {} = {}'.format(len(frames), RECORD_SECONDS, len(frames) / RECORD_SECONDS))
-    logger.debug('{} total frames'.format(len(frames)))
+    logger.info('Pass frames to front end for data visualization')
+
     plot_signal(frames, RATE / CHUNK)
