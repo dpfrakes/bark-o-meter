@@ -14,7 +14,7 @@ stream = p.open(format=FORMAT,
                 frames_per_buffer=CHUNK)
 
 logger.info('Started recording')
-startTime = datetime.now()
+start_time = datetime.now()
 is_barking = False
 
 try:
@@ -39,8 +39,8 @@ except KeyboardInterrupt as e:
 
 finally:
     logger.info('Stopped recording')
-    stopTime = datetime.now()
-    logger.info('{} barks in {} seconds'.format(barks, stopTime - startTime))
+    stop_time = datetime.now()
+    logger.info('{} barks in {} seconds'.format(barks, stop_time - start_time))
 
     stream.stop_stream()
     stream.close()
@@ -48,4 +48,4 @@ finally:
 
     logger.info('Pass frames to front end for data visualization')
 
-    plot_signal(frames, RATE / CHUNK)
+    plot_signal(frames, RATE / CHUNK, start_time.strftime('%Y%m%d_%H%M%S'))
