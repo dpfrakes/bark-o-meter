@@ -1,4 +1,4 @@
-# Pet Project
+# 🐶 Pet Project
 
 Install on any machine with a microphone:
 
